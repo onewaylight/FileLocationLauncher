@@ -23,6 +23,7 @@ namespace FileLocationLauncher
                 {
                     // Register services
                     services.AddSingleton<IFileLocationService, FileLocationService>();
+                    services.AddSingleton<IProjectTypeService, ProjectTypeService>();
 
                     // Choose between dialog service implementations:
                     // Option 1: Pure WPF approach (recommended)

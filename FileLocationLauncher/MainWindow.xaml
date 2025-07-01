@@ -6,6 +6,8 @@
         xmlns:local="clr-namespace:FileLocationLauncher"
         xmlns:converter="clr-namespace:FileLocationLauncher.Converters"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F5F5"
         Title="MainWindow" Height="800" Width="1400">
     <Window.Resources>
         <!-- Converters -->
@@ -267,7 +269,7 @@
                                 <StackPanel Grid.Row="1" Margin="0,0,0,10">
                                     <TextBlock Text="{Binding FilePath}" 
                                                FontSize="12" 
-                                               Foreground="#666" 
+                                               Foreground="#777" 
                                                TextTrimming="CharacterEllipsis"
                                                ToolTip="{Binding FilePath}"
                                                Margin="0,0,0,5"/>
@@ -310,11 +312,11 @@
                                              Margin="0,0,5,0"/>
                                     <TextBlock Text="{Binding FileExists, Converter={StaticResource BoolToStatusConverter}}" 
                                                FontSize="11" 
-                                               Foreground="#666" 
+                                               Foreground="#777" 
                                                VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding LastModified, StringFormat='Modified: {0:MM/dd/yyyy}'}" 
                                                FontSize="11" 
-                                               Foreground="#666" 
+                                               Foreground="#777" 
                                                Margin="10,0,0,0"/>
                                 </StackPanel>
 
