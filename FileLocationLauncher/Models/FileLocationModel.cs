@@ -8,17 +8,14 @@ using System.Threading.Tasks;
 
 namespace FileLocationLauncher.Models
 {
-    public partial class FileLocationModel : ObservableValidator
+    public partial class FileLocationModel : ObservableObject
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 
         [ObservableProperty]
-        [Required]
-        [StringLength(100)]
         private string name = string.Empty;
 
         [ObservableProperty]
-        [Required]
         private string filePath = string.Empty;
 
         [ObservableProperty]

@@ -46,7 +46,11 @@ namespace FileLocationLauncher.ViewModels
             _dialogService = dialogService;
             _projectTypeService = projectTypeService;
 
-            LoadProjectTypesAsync();
+            // Initialize with empty FileLocation
+            FileLocation = new FileLocationModel();
+
+            // Load project types asynchronously
+            _ = Task.Run(async () => await LoadProjectTypesAsync());
         }
 
         partial void OnSelectedProjectTypeChanged(ProjectTypeModel? value)
@@ -57,28 +61,67 @@ namespace FileLocationLauncher.ViewModels
             }
         }
 
+        // Handle when text is manually entered in ComboBox
+        partial void OnFileLocationChanged(FileLocationModel? value)
+        {
+            if (value != null && !string.IsNullOrEmpty(value.ProjectType))
+            {
+                try
+                {
+                    // Update selected project type when FileLocation.ProjectType changes
+                    var matchingType = AvailableProjectTypes?.FirstOrDefault(p => p.Name == value.ProjectType);
+                    if (matchingType != null && SelectedProjectType != matchingType)
+                    {
+                        SelectedProjectType = matchingType;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"OnFileLocationChanged error: {ex.Message}");
+                }
+            }
+        }
+
         private async Task LoadProjectTypesAsync()
         {
             try
             {
                 var projectTypes = await _projectTypeService.GetAllProjectTypesAsync();
-                AvailableProjectTypes.Clear();
 
-                foreach (var projectType in projectTypes)
+                // Must update UI on main thread
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    AvailableProjectTypes.Add(projectType);
-                }
+                    AvailableProjectTypes.Clear();
+
+                    foreach (var projectType in projectTypes)
+                    {
+                        AvailableProjectTypes.Add(projectType);
+                    }
+                });
             }
             catch (Exception ex)
             {
-                await _dialogService.ShowErrorDialogAsync($"Failed to load project types: {ex.Message}");
+                // Log the error and show user-friendly message
+                System.Diagnostics.Debug.WriteLine($"Failed to load project types: {ex.Message}");
+
+                Application.Current.Dispatcher.Invoke(async () =>
+                {
+                    await _dialogService.ShowErrorDialogAsync($"Failed to load project types: {ex.Message}");
+                });
             }
         }
 
-        public void LoadFileLocation(FileLocationModel model)
+        public async void LoadFileLocation(FileLocationModel model)
         {
             IsEditMode = true;
             WindowTitle = "Edit File Location";
+
+            // Wait for project types to load if they haven't already
+            if (!AvailableProjectTypes.Any())
+            {
+                await LoadProjectTypesAsync();
+            }
+
             FileLocation = new FileLocationModel
             {
                 Id = model.Id,
@@ -92,7 +135,8 @@ namespace FileLocationLauncher.ViewModels
                 LastModified = model.LastModified
             };
 
-            // Set selected project type
+            // Set selected project type after FileLocation is set
+            await Task.Delay(50); // Small delay to ensure UI is ready
             SelectedProjectType = AvailableProjectTypes.FirstOrDefault(p => p.Name == model.ProjectType);
         }
 
@@ -187,34 +231,22 @@ namespace FileLocationLauncher.ViewModels
         [RelayCommand]
         private async Task AddNewProjectTypeAsync()
         {
-            // Simple input dialog for adding new project type
-            // In a real application, you'd want a proper dialog
-            var newTypeName = Microsoft.VisualBasic.Interaction.InputBox(
-                "Enter new project type name:",
-                "Add Project Type",
-                "");
-
-            if (!string.IsNullOrWhiteSpace(newTypeName))
+            try
             {
-                try
+                // Simple input dialog using MessageBox (you could create a proper dialog later)
+                var result = await Task.Run(() =>
                 {
-                    var newProjectType = new ProjectTypeModel
-                    {
-                        Name = newTypeName.Trim(),
-                        Icon = "📄",
-                        Color = "#6C757D",
-                        Description = $"Custom project type: {newTypeName}"
-                    };
-
-                    await _projectTypeService.AddProjectTypeAsync(newProjectType);
-                    await LoadProjectTypesAsync();
-
-                    SelectedProjectType = AvailableProjectTypes.FirstOrDefault(p => p.Name == newTypeName);
-                }
-                catch (Exception ex)
-                {
-                    await _dialogService.ShowErrorDialogAsync($"Failed to add project type: {ex.Message}");
-                }
+                    return System.Windows.MessageBox.Show(
+                        "Enter new project type name in the combo box and it will be saved automatically.",
+                        "Add Project Type",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"AddNewProjectType error: {ex.Message}");
+                await _dialogService.ShowErrorDialogAsync($"Failed to add project type: {ex.Message}");
             }
         }
 
@@ -266,13 +298,16 @@ namespace FileLocationLauncher.ViewModels
 
         private bool ValidateModel()
         {
-            var context = new ValidationContext(FileLocation);
-            var results = new System.Collections.Generic.List<ValidationResult>();
-
-            if (!Validator.TryValidateObject(FileLocation, context, results, true))
+            // Manually validate required fields
+            if (string.IsNullOrWhiteSpace(FileLocation.Name))
             {
-                var errorMessage = string.Join("\n", results.ConvertAll(r => r.ErrorMessage));
-                _dialogService.ShowErrorDialogAsync(errorMessage, "Validation Error");
+                _dialogService.ShowErrorDialogAsync("Name is required.", "Validation Error");
+                return false;
+            }
+
+            if (FileLocation.Name.Length > 100)
+            {
+                _dialogService.ShowErrorDialogAsync("Name cannot exceed 100 characters.", "Validation Error");
                 return false;
             }
 

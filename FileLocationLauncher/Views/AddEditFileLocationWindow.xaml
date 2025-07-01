@@ -123,7 +123,6 @@
                               ItemsSource="{Binding AvailableProjectTypes}"
                               SelectedItem="{Binding SelectedProjectType}"
                               IsEditable="True"
-                              Text="{Binding FileLocation.ProjectType, UpdateSourceTrigger=PropertyChanged}"
                               Padding="8"
                               BorderBrush="#DDD">
                         <ComboBox.ItemTemplate>

@@ -112,8 +112,10 @@ namespace FileLocationLauncher.ViewModels
 
             var addEditWindow = _serviceProvider.GetRequiredService<AddEditFileLocationWindow>();
             var viewModel = _serviceProvider.GetRequiredService<AddEditFileLocationViewModel>();
-            viewModel.LoadFileLocation(fileLocation);
             addEditWindow.DataContext = viewModel;
+
+            // Load the file location data
+            viewModel.LoadFileLocation(fileLocation);
 
             if (addEditWindow.ShowDialog() == true)
             {

@@ -12,6 +12,12 @@ namespace FileLocationLauncher.Models
         public string Icon { get; set; } = string.Empty;
         public string Color { get; set; } = "#007ACC";
         public string Description { get; set; } = string.Empty;
+
+        // Override ToString to return the Name for ComboBox display
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 
     public class ProjectTypeConfiguration

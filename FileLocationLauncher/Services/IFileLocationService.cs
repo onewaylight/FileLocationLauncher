@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FileLocationLauncher.Services
 {
-    public interface IFileLocationService
+    public interface IFileLocationService : IDisposable
     {
         Task<IEnumerable<FileLocationModel>> GetAllAsync();
         Task<FileLocationModel?> GetByIdAsync(Guid id);
