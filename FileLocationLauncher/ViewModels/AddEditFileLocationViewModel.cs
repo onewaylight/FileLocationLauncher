@@ -115,6 +115,9 @@ namespace FileLocationLauncher.ViewModels
 
                 // Auto-detect project type based on file extension
                 await AutoDetectProjectTypeAsync(filePath);
+
+                // Force UI update
+                OnPropertyChanged(nameof(FileLocation));
             }
         }
 
@@ -132,6 +135,9 @@ namespace FileLocationLauncher.ViewModels
 
                 // Auto-detect project type based on folder contents
                 await AutoDetectProjectTypeAsync(folderPath);
+
+                // Force UI update
+                OnPropertyChanged(nameof(FileLocation));
             }
         }
 

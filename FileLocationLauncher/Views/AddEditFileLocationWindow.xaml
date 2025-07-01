@@ -91,7 +91,8 @@
                     <TextBox Grid.Column="0" 
                              Text="{Binding FileLocation.FilePath, UpdateSourceTrigger=PropertyChanged}" 
                              Style="{StaticResource FormTextBoxStyle}"
-                             Margin="0"/>
+                             Margin="0"
+                             ToolTip="{Binding FileLocation.FilePath}"/>
 
                     <Button Grid.Column="1" 
                             Content="📁" 
@@ -112,22 +113,41 @@
 
                 <!-- Project Type -->
                 <TextBlock Text="Project Type" Style="{StaticResource FormLabelStyle}"/>
-                <ComboBox Text="{Binding FileLocation.ProjectType, UpdateSourceTrigger=PropertyChanged}"
-                          IsEditable="True"
-                          Margin="0,0,0,15"
-                          Padding="8"
-                          BorderBrush="#DDD">
-                    <ComboBoxItem Content="Visual Studio Solution"/>
-                    <ComboBoxItem Content="Visual Studio Project"/>
-                    <ComboBoxItem Content="Web Application"/>
-                    <ComboBoxItem Content="Desktop Application"/>
-                    <ComboBoxItem Content="Mobile Application"/>
-                    <ComboBoxItem Content="Library"/>
-                    <ComboBoxItem Content="Documentation"/>
-                    <ComboBoxItem Content="Configuration"/>
-                    <ComboBoxItem Content="Script"/>
-                    <ComboBoxItem Content="Other"/>
-                </ComboBox>
+                <Grid Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ComboBox Grid.Column="0"
+                              ItemsSource="{Binding AvailableProjectTypes}"
+                              SelectedItem="{Binding SelectedProjectType}"
+                              IsEditable="True"
+                              Text="{Binding FileLocation.ProjectType, UpdateSourceTrigger=PropertyChanged}"
+                              Padding="8"
+                              BorderBrush="#DDD">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Icon}" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding Description}" FontSize="11" Foreground="#6C757D" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <Button Grid.Column="1" 
+                            Content="➕" 
+                            Command="{Binding AddNewProjectTypeCommand}"
+                            ToolTip="Add New Project Type"
+                            Margin="8,0,0,0" 
+                            Padding="10,8"
+                            BorderBrush="#DDD"
+                            Background="#F8F9FA"/>
+                </Grid>
 
                 <!-- Description -->
                 <TextBlock Text="Description" Style="{StaticResource FormLabelStyle}"/>

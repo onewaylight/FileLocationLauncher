@@ -200,8 +200,22 @@ namespace FileLocationLauncher.Services
                     if (loadedData != null)
                     {
                         _fileLocations.Clear();
-                        _fileLocations.AddRange(loadedData);
+
+                        // Clean up file paths while loading
+                        foreach (var item in loadedData)
+                        {
+                            CleanUpFilePath(item);
+                            _fileLocations.Add(item);
+                        }
+
                         Debug.WriteLine($"Successfully loaded {_fileLocations.Count} items");
+
+                        // Save cleaned data back to file
+                        if (loadedData.Any(item => NeedsPathCleanup(item.FilePath)))
+                        {
+                            Debug.WriteLine("Found paths needing cleanup, saving cleaned data");
+                            SaveDataSync();
+                        }
                     }
                 }
             }
@@ -210,6 +224,45 @@ namespace FileLocationLauncher.Services
                 Debug.WriteLine($"Failed to load data: {ex.Message}");
                 Debug.WriteLine($"Stack trace: {ex.StackTrace}");
             }
+        }
+
+        private void CleanUpFilePath(FileLocationModel fileLocation)
+        {
+            if (string.IsNullOrEmpty(fileLocation.FilePath))
+                return;
+
+            var originalPath = fileLocation.FilePath;
+            var cleanedPath = originalPath;
+
+            // Remove "Folder Selection.folder" if it exists
+            if (cleanedPath.EndsWith("Folder Selection.folder", StringComparison.OrdinalIgnoreCase))
+            {
+                cleanedPath = cleanedPath.Replace("Folder Selection.folder", "").TrimEnd('\\', '/');
+            }
+
+            // Remove ".folder" extension if it exists
+            if (cleanedPath.EndsWith(".folder", StringComparison.OrdinalIgnoreCase))
+            {
+                var directory = Path.GetDirectoryName(cleanedPath);
+                if (!string.IsNullOrEmpty(directory) && Directory.Exists(directory))
+                {
+                    cleanedPath = directory;
+                }
+            }
+
+            // Update the file location if path was cleaned
+            if (cleanedPath != originalPath)
+            {
+                Debug.WriteLine($"Cleaned path: '{originalPath}' -> '{cleanedPath}'");
+                fileLocation.FilePath = cleanedPath;
+            }
+        }
+
+        private bool NeedsPathCleanup(string filePath)
+        {
+            return !string.IsNullOrEmpty(filePath) &&
+                   (filePath.EndsWith("Folder Selection.folder", StringComparison.OrdinalIgnoreCase) ||
+                    filePath.EndsWith(".folder", StringComparison.OrdinalIgnoreCase));
         }
 
         private void SaveDataSync()

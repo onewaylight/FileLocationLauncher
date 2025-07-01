@@ -50,7 +50,7 @@ namespace FileLocationLauncher.Services
                 CheckFileExists = false,
                 CheckPathExists = true,
                 ValidateNames = false,
-                FileName = "Folder Selection",
+                FileName = "Folder Selection.folder",
                 Filter = "Folders|*.folder",
                 Title = "Select Folder"
             };
@@ -71,10 +71,29 @@ namespace FileLocationLauncher.Services
             {
                 var selectedPath = dialog.FileName;
 
-                // Clean up the path
-                if (selectedPath.EndsWith("Folder Selection"))
+                // Clean up the path - remove "Folder Selection.folder" if it exists
+                if (selectedPath.EndsWith("Folder Selection.folder", StringComparison.OrdinalIgnoreCase))
                 {
-                    return System.IO.Path.GetDirectoryName(selectedPath);
+                    selectedPath = selectedPath.Replace("Folder Selection.folder", "").TrimEnd('\\', '/');
+                }
+
+                // If it ends with ".folder", remove it
+                if (selectedPath.EndsWith(".folder", StringComparison.OrdinalIgnoreCase))
+                {
+                    selectedPath = System.IO.Path.GetDirectoryName(selectedPath) ?? selectedPath;
+                }
+
+                // Ensure we return a valid directory path
+                if (System.IO.Directory.Exists(selectedPath))
+                {
+                    return selectedPath;
+                }
+
+                // Try getting the directory of the selected path
+                var directory = System.IO.Path.GetDirectoryName(selectedPath);
+                if (!string.IsNullOrEmpty(directory) && System.IO.Directory.Exists(directory))
+                {
+                    return directory;
                 }
 
                 return selectedPath;
@@ -90,13 +109,17 @@ namespace FileLocationLauncher.Services
                 CheckFileExists = false,
                 CheckPathExists = true,
                 ValidateNames = false,
-                Title = "Select any file in the desired folder",
+                Title = "Select any file in the desired folder (the folder will be used)",
                 Filter = "All files (*.*)|*.*"
             };
 
             if (dialog.ShowDialog() == true)
             {
-                return System.IO.Path.GetDirectoryName(dialog.FileName);
+                var selectedPath = dialog.FileName;
+
+                // Always return the directory of the selected file
+                var directory = System.IO.Path.GetDirectoryName(selectedPath);
+                return !string.IsNullOrEmpty(directory) ? directory : selectedPath;
             }
 
             return null;
@@ -216,6 +239,8 @@ namespace FileLocationLauncher.Services
                         {
                             dialog.GetResult(out IShellItem shellItem);
                             shellItem.GetDisplayName(SIGDN_FILESYSPATH, out string path);
+
+                            // This method already returns the clean folder path
                             return path;
                         }
                     }

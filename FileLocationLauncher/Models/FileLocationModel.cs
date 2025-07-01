@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,28 +8,34 @@ using System.Threading.Tasks;
 
 namespace FileLocationLauncher.Models
 {
-    public class FileLocationModel
+    public partial class FileLocationModel : ObservableValidator
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 
+        [ObservableProperty]
         [Required]
         [StringLength(100)]
-        public string Name { get; set; } = string.Empty;
+        private string name = string.Empty;
 
+        [ObservableProperty]
         [Required]
-        public string FilePath { get; set; } = string.Empty;
+        private string filePath = string.Empty;
 
-        public string Description { get; set; } = string.Empty;
+        [ObservableProperty]
+        private string description = string.Empty;
 
-        public string ProjectType { get; set; } = string.Empty;
+        [ObservableProperty]
+        private string projectType = string.Empty;
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         public DateTime LastModified { get; set; } = DateTime.Now;
 
-        public string Tags { get; set; } = string.Empty;
+        [ObservableProperty]
+        private string tags = string.Empty;
 
-        public bool IsFavorite { get; set; }
+        [ObservableProperty]
+        private bool isFavorite;
 
         public string FileExtension => System.IO.Path.GetExtension(FilePath);
 
