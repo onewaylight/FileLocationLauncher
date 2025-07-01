@@ -11,6 +11,10 @@
   <img src="./FileLocationLauncher/main.png" />
 </p>
 
+<p align="center"></p>
+  <img src="./FileLocationLauncher/add_new_location.png" />
+</p>
+
   ![](./FileLocationLauncher/main.png)
 
   ![](./FileLocationLauncher/add_new_location.png)
