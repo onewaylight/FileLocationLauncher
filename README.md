@@ -7,10 +7,14 @@
 - CommunityToolkit.Mvvm
 - Dependency Injection
 
-<center>
+<p align="center"></p>
+  <img src="./FileLocationLauncher/main.png" />
+</p>
 
   ![](./FileLocationLauncher/main.png)
 
   ![](./FileLocationLauncher/add_new_location.png)
-  
-</center>
+
+  <p align="center">
+  <img src="http://some_place.com/image.png" />
+</p>
