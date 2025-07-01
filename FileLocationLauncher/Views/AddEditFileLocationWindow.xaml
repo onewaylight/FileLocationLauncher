@@ -122,6 +122,7 @@
                     <ComboBox Grid.Column="0"
                               ItemsSource="{Binding AvailableProjectTypes}"
                               SelectedItem="{Binding SelectedProjectType}"
+                              Text="{Binding FileLocation.ProjectType, UpdateSourceTrigger=PropertyChanged}"
                               IsEditable="True"
                               Padding="8"
                               BorderBrush="#DDD">
