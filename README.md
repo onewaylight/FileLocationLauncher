@@ -8,7 +8,9 @@
 - Dependency Injection
 
 <center>
-![](./FileLocationLauncher/main.png)
 
-![](./FileLocationLauncher/add_new_location.png)
+  ![](./FileLocationLauncher/main.png)
+
+  ![](./FileLocationLauncher/add_new_location.png)
+  
 </center>
